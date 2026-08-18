@@ -162,12 +162,14 @@ require_once __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Time Slot Selection -->
-          <div class="form-group" id="slotSection" style="display:none;">
+          <div class="form-group" id="slotSection">
             <label class="form-label">
               <i class="bi bi-clock" style="color:var(--c-accent-light);"></i> Select Time Slot
             </label>
             <div class="slot-grid" id="slotGrid">
-              <!-- Populated by JS after court and date are selected -->
+              <p id="slotPlaceholder" class="slot-placeholder">
+                <i class="bi bi-hand-index"></i> Select a court above to see available time slots
+              </p>
             </div>
           </div>
 
@@ -362,11 +364,10 @@ function loadAvailability() {
     if (!date) return;
 
     const loader   = document.getElementById('availabilityLoader');
-    const slotSec  = document.getElementById('slotSection');
     const slotGrid = document.getElementById('slotGrid');
 
     loader.style.display = 'flex';
-    slotSec.style.display = 'none';
+    slotGrid.innerHTML = '';
     selectedSlot = null;
     updateProceedBtn();
 
@@ -383,28 +384,42 @@ function loadAvailability() {
                     }
                 });
             }
-        });
+        })
+        .catch(err => console.error('Court availability fetch error:', err));
 
     // Load time slots for selected court
     fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}&individual_court_id=${selectedCourtId}`)
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) { throw new Error('API returned status ' + r.status); }
+            return r.json();
+        })
         .then(data => {
             loader.style.display = 'none';
-            if (data.error) { showToast(data.message, 'error'); return; }
+            if (data.error) {
+                console.error('Availability API error:', data.message);
+                showToast(data.message, 'error');
+                slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-exclamation-circle"></i> ' + (data.message || 'Failed to load slots') + '</p>';
+                return;
+            }
+
+            if (!data.slots || data.slots.length === 0) {
+                slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-calendar-x"></i> No time slots available for this date.</p>';
+                return;
+            }
 
             slotGrid.innerHTML = data.slots.map(slot => `
                 <div class="slot-cell ${slot.is_booked ? 'booked' : 'available'}"
                      data-slot="${slot.slot}"
-                     ${slot.is_booked ? '' : `onclick="selectSlot(this, '${slot.slot.replace(/'/g, "\\'")}')`}>
+                     ${slot.is_booked ? '' : `onclick="selectSlot(this, '${slot.slot.replace(/'/g, "\\\'")}')"`}>
                     ${slot.slot}
                     ${slot.is_booked ? '<div style="font-size:0.65rem;margin-top:2px;">Booked</div>' : ''}
                 </div>
             `).join('');
-
-            slotSec.style.display = 'block';
         })
-        .catch(() => {
+        .catch(err => {
+            console.error('Slot fetch error:', err);
             loader.style.display = 'none';
+            slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-wifi-off"></i> Failed to load availability. Please try again.</p>';
             showToast('Failed to load availability', 'error');
         });
 }
@@ -687,6 +702,39 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .confirmation-title { font-size: 2rem; font-weight: 800; margin-bottom: var(--sp-3); }
 .confirmation-sub   { font-size: 1rem; color: var(--c-text-muted); margin-bottom: var(--sp-6); }
+
+/* ─── Date picker icon fix for dark mode ─────────────────────── */
+input[type="date"].form-control {
+  color-scheme: dark;
+  position: relative;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(0.2) saturate(3) hue-rotate(180deg);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* ─── Slot placeholder message ───────────────────────────────── */
+.slot-placeholder {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--c-text-muted);
+  font-size: 0.875rem;
+  padding: var(--sp-6) var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin: 0;
+}
+.slot-placeholder i {
+  font-size: 1rem;
+  color: var(--c-accent-light);
+}
 
 @media (max-width: 768px) {
   .booking-two-col { grid-template-columns: 1fr; }
