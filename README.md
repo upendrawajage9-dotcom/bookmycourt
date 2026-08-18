@@ -2,7 +2,7 @@
 
 > A full-stack badminton court booking platform for Pune. Browse venues, select real-time available slots, and pay securely via Razorpay.
 
-**Live Demo:** [your-live-link-here](#) <!-- Replace with your deployed URL -->
+**Live Demo:** [https://bookmycourt-production.up.railway.app](https://bookmycourt-production.up.railway.app/)
 
 ---
 
@@ -103,7 +103,7 @@ WebContent/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/bookmycourt.git
+git clone https://github.com/upendrawajage9-dotcom/bookmycourt.git
 cd bookmycourt
 ```
 
@@ -217,6 +217,5 @@ MIT License — free to use for personal and educational purposes.
 
 ## 👤 Author
 
-**Your Name**  
-📧 your.email@example.com  
-🔗 [LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/yourusername)
+**Upendra Wajage**  
+🔗 [GitHub](https://github.com/upendrawajage9-dotcom)
