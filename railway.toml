@@ -2,6 +2,9 @@
 # Railway auto-detects Dockerfile and uses this config for settings.
 # Docs: https://docs.railway.app/reference/config-as-code
 
+[build]
+dockerfilePath = "Dockerfile"
+
 [deploy]
 healthcheckPath = "/index.php"
 healthcheckTimeout = 30
