@@ -6,8 +6,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite headers
+# Fix MPM conflict: disable event/worker, then enable prefork + needed modules
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork rewrite headers
 
 # Set working directory
 WORKDIR /var/www/html
@@ -24,8 +25,8 @@ RUN chown -R www-data:www-data /var/www/html \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && chmod 600 /var/www/html/.env 2>/dev/null || true
 
-# Apache configuration
-RUN echo '<VirtualHost *:80>\n\
+# Apache configuration — listen on PORT (Railway) or default 80
+RUN echo '<VirtualHost *:${PORT}>\n\
     DocumentRoot /var/www/html\n\
     <Directory /var/www/html>\n\
         Options -Indexes +FollowSymLinks\n\
@@ -36,6 +37,10 @@ RUN echo '<VirtualHost *:80>\n\
     CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
+# Railway injects PORT env var; default to 80 for local builds
+RUN echo 'Listen ${PORT}' > /etc/apache2/ports.conf
+
+ENV PORT=80
 EXPOSE 80
 
 CMD ["apache2-foreground"]
