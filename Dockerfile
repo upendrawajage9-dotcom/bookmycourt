@@ -6,8 +6,12 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Fix MPM conflict: disable event/worker, then enable prefork + needed modules
-RUN a2dismod mpm_event mpm_worker || true \
+# Fix MPM conflict: forcibly remove event/worker, enable prefork + needed modules
+# Force cache bust: 2026-08-18T13:24
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
+          /etc/apache2/mods-enabled/mpm_event.conf \
+          /etc/apache2/mods-enabled/mpm_worker.load \
+          /etc/apache2/mods-enabled/mpm_worker.conf \
     && a2enmod mpm_prefork rewrite headers
 
 # Set working directory
