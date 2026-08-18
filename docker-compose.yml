@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  # ─── PHP + Apache Application ───────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bookmycourt_app
+    ports:
+      - "8080:80"
+    environment:
+      APP_NAME: BookMyCourt
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8080
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: badminton_booking
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-strongpassword}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      RAZORPAY_CURRENCY: INR
+      RAZORPAY_MODE: ${RAZORPAY_MODE:-test}
+      SESSION_LIFETIME: "7200"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./.env:/var/www/html/.env:ro   # Mount .env read-only (don't bake secrets into image)
+
+  # ─── PostgreSQL Database ─────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: bookmycourt_db
+    environment:
+      POSTGRES_DB: badminton_booking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-strongpassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d badminton_booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

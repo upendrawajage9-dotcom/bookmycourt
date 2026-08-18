@@ -1,0 +1,59 @@
+services:
+  # ─── Web Application ─────────────────────────────────────────
+  - type: web
+    name: bookmycourt
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_NAME
+        value: BookMyCourt
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        fromService:
+          type: web
+          name: bookmycourt
+          property: host
+      - key: DB_HOST
+        fromDatabase:
+          name: bookmycourt-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: bookmycourt-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: bookmycourt-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: bookmycourt-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: bookmycourt-db
+          property: password
+      - key: RAZORPAY_KEY_ID
+        sync: false       # Set manually in Render dashboard
+      - key: RAZORPAY_KEY_SECRET
+        sync: false       # Set manually in Render dashboard
+      - key: RAZORPAY_CURRENCY
+        value: INR
+      - key: RAZORPAY_MODE
+        value: live
+      - key: SESSION_LIFETIME
+        value: "7200"
+    healthCheckPath: /index.php
+    autoDeploy: true
+
+  # ─── PostgreSQL Database ─────────────────────────────────────
+  - type: pserv
+    name: bookmycourt-db
+    runtime: docker
+    databases:
+      - name: bookmycourt-db
+        databaseName: badminton_booking
+        user: postgres
