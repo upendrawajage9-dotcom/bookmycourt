@@ -1,0 +1,345 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at top left, #1e88e5, #0d47a1 40%, #000000 100%);
+    color: #f5f5f5;
+}
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-card {
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 18px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    max-width: 960px;
+    width: 100%;
+}
+
+.auth-left {
+    background: linear-gradient(135deg, rgba(30, 136, 229, 0.4), rgba(41, 182, 246, 0.1));
+    padding: 40px 32px;
+    border-right: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.auth-right {
+    padding: 32px 28px;
+}
+
+.logo-badge {
+    width: 300px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 4px;
+}
+
+.logo-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo-img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+.brand-subtitle {
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #cbd5f5;
+}
+
+.brand-title {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.tagline {
+    font-size: 16px;
+    margin-top: 18px;
+    color: #e0ecff;
+}
+
+.feature-list {
+    margin-top: 30px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+.feature-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #4ade80;
+    margin-right: 10px;
+    margin-top: 5px;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+}
+
+.small-link {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.small-link a {
+    color: #7dd3fc;
+    text-decoration: none;
+}
+
+.small-link a:hover {
+    text-decoration: underline;
+}
+
+.auth-toggle {
+    display: flex;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 24px;
+}
+
+.auth-toggle button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 14px;
+    padding: 8px 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-toggle button.active {
+    background: linear-gradient(135deg, #1e88e5, #29b6f6);
+    color: #ffffff;
+    box-shadow: 0 8px 15px rgba(41, 182, 246, 0.4);
+}
+
+.auth-heading {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.auth-subheading {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-size: 13px;
+    color: #e5e7eb;
+}
+
+.form-control {
+    background-color: #020617;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    color: #e5e7eb;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 0 1px rgba(30, 136, 229, 0.5);
+    background-color: #020617;
+    color: #f9fafb;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #1e88e5, #29b6f6);
+    border: none;
+    border-radius: 999px;
+    padding: 10px 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-primary-custom:hover {
+    filter: brightness(1.08);
+}
+
+.btn-success-custom {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    border: none;
+    border-radius: 999px;
+    padding: 10px 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.btn-success-custom:hover {
+    filter: brightness(1.06);
+}
+
+.error-text {
+    font-size: 12px;
+    color: #fca5a5;
+}
+
+.success-text {
+    font-size: 12px;
+    color: #bbf7d0; /* light green */
+}
+
+.auth-left {
+    background: linear-gradient(135deg, rgba(30, 136, 229, 0.4), rgba(41, 182, 246, 0.1));
+    padding: 40px 32px;
+    border-right: 1px solid rgba(148, 163, 184, 0.2);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;  /* keep text from going too low */
+}
+
+
+@media (max-width: 768px) {
+    .auth-left {
+        display: none;
+    }
+
+    .auth-right {
+        padding: 24px 20px;
+    }
+
+    .auth-card {
+        max-width: 420px;
+    }
+
+    body {
+        background: radial-gradient(circle at top, #1e88e5, #020617);
+    }
+}
+/* Courts page specific */
+
+.courts-body {
+    background: radial-gradient(circle at top left, #1e88e5, #0d47a1 40%, #000000 100%);
+    color: #f5f5f5;
+}
+
+.courts-navbar {
+    background: rgba(15, 23, 42, 0.98);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.nav-logo {
+    width: 42px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.courts-welcome-text {
+    font-size: 14px;
+    color: #e5e7eb;
+}
+
+.courts-title {
+    color: #e5e7eb;
+    font-weight: 600;
+}
+
+.courts-subtitle {
+    color: #cbd5f5;
+    font-size: 14px;
+}
+
+.hall-card {
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.6);
+    overflow: hidden;
+    color: #e5e7eb;
+}
+
+.hall-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.card-location {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+
+.card-section-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #cbd5f5;
+}
+
+.card-list {
+    padding-left: 18px;
+    font-size: 13px;
+    color: #e5e7eb;
+    margin-bottom: 10px;
+}
+
+.card-timing {
+    font-size: 13px;
+    color: #a5b4fc;
+}
+.card-price{
+display:flex;
+align-items:center;
+gap:6px;
+margin-top:2px;
+}
+
+.card-price .currency{
+font-size:22px;
+font-weight:700;
+color:#22c55e;
+}
+
+.card-price .amount{
+font-size:30px;
+font-weight:700;
+color:#22c55e;
+}
+
+.card-price .unit{
+font-size:18px;
+font-weight:500;
+color:#9ca3af;
+margin-left:2px;
+}
+
+
+
+
+
+

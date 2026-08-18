@@ -1,0 +1,186 @@
+/* =============================================================
+   BookMyCourt — Court Details + Booking Pages
+   ============================================================= */
+
+/* ─── Details Layout ─────────────────────────────────────────── */
+.details-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--sp-8);
+  padding: var(--sp-6) 0 var(--sp-16);
+  align-items: start;
+}
+
+.details-left { display: flex; flex-direction: column; gap: var(--sp-6); }
+
+/* ─── Gallery ────────────────────────────────────────────────── */
+
+/* ─── Venue Detail Card ──────────────────────────────────────── */
+.venue-detail-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--c-text-bright);
+  margin-bottom: 6px;
+}
+.venue-detail-location {
+  font-size: 0.875rem;
+  color: var(--c-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+}
+.venue-detail-location i { color: var(--c-accent-light); }
+
+.rating-big {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--c-warning-light);
+  line-height: 1;
+}
+
+.venue-description {
+  font-size: 0.9375rem;
+  color: var(--c-text-dim);
+  line-height: 1.75;
+  margin-bottom: var(--sp-6);
+}
+
+/* Info grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-5);
+  background: var(--c-surface-2);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--c-border);
+}
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+.info-icon {
+  font-size: 1.25rem;
+  color: var(--c-accent-light);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.info-label {
+  font-size: 0.75rem;
+  color: var(--c-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.info-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--c-text-bright);
+}
+
+/* Detail sections */
+.detail-section {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--c-border);
+}
+.detail-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--c-text-bright);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+.detail-section-title i { color: var(--c-accent-light); }
+
+.rules-text {
+  font-size: 0.875rem;
+  color: var(--c-text-dim);
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* ─── Reviews ────────────────────────────────────────────────── */
+.reviews-list { display: flex; flex-direction: column; gap: var(--sp-5); }
+.review-item {
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--c-border);
+}
+.review-item:last-child { border-bottom: none; padding-bottom: 0; }
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.review-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-accent), var(--c-accent-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.875rem; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.review-author { font-size: 0.875rem; font-weight: 700; color: var(--c-text-bright); }
+.review-date   { font-size: 0.75rem; color: var(--c-text-muted); }
+.review-text   { font-size: 0.875rem; color: var(--c-text-dim); line-height: 1.65; margin: 0; }
+
+/* ─── Booking Panel ──────────────────────────────────────────── */
+
+.booking-panel-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: var(--sp-5);
+}
+.bpp-currency { font-size: 1.5rem; font-weight: 800; color: var(--c-success-light); }
+.bpp-amount   { font-size: 3rem; font-weight: 800; color: var(--c-success-light); line-height: 1; }
+.bpp-unit     { font-size: 0.875rem; color: var(--c-text-muted); }
+
+.panel-courts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+.panel-court-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  color: var(--c-text-dim);
+}
+
+.panel-hours { text-align: center; }
+.panel-hours-title { font-size: 0.8rem; color: var(--c-text-muted); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.panel-hours-title i { color: var(--c-accent-light); }
+.panel-hours-time { font-size: 1.125rem; font-weight: 700; color: var(--c-text-bright); }
+
+/* ─── Booking Flow Page ──────────────────────────────────────── */
+.booking-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-16);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .details-layout { grid-template-columns: 1fr 320px; gap: var(--sp-5); }
+}
+
+@media (max-width: 768px) {
+  .details-layout { grid-template-columns: 1fr; }
+
+  .booking-panel { position: static !important; }
+  .info-grid { grid-template-columns: 1fr; }
+}
