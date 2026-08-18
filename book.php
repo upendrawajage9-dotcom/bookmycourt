@@ -172,7 +172,7 @@ require_once __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Loading indicator -->
-          <div id="availabilityLoader" style="display:none;" class="loader" style="padding:var(--sp-8);">
+          <div id="availabilityLoader" style="display:none; padding:var(--sp-8);" class="loader">
             <div class="spinner"></div>
             <p>Checking availability...</p>
           </div>
