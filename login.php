@@ -97,8 +97,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $_SESSION['user_phone']= $user['phone'];
 
                     // Redirect to originally intended page, or courts
-                    $redirectTo = $_SESSION['redirect_after_login'] ?? (BASE_URL . '/courts.php');
+                    // SECURITY: Validate redirect target is same-origin to prevent open redirect
+                    $defaultRedirect = BASE_URL . '/courts.php';
+                    $rawRedirect     = $_SESSION['redirect_after_login'] ?? '';
                     unset($_SESSION['redirect_after_login']);
+
+                    // Only allow redirects that start with our own BASE_URL (same-origin)
+                    if (!empty($rawRedirect) && str_starts_with($rawRedirect, BASE_URL . '/')) {
+                        $redirectTo = $rawRedirect;
+                    } else {
+                        $redirectTo = $defaultRedirect;
+                    }
 
                     header('Location: ' . $redirectTo);
                     exit();
