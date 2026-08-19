@@ -334,8 +334,6 @@ require_once __DIR__ . '/includes/header.php';
 
 </div><!-- /.booking-page -->
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
-
 <!-- Razorpay SDK (only loaded when key is configured) -->
 <?php if (!str_contains($razorpayKeyId, 'REPLACE')): ?>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -790,3 +788,5 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   .booking-venue-card { position: static; }
 }
 </style>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
