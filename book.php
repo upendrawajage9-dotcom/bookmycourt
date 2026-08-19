@@ -338,6 +338,15 @@ const CSRF_TOKEN = '<?php echo csrfToken(); ?>';
 const TEST_MODE  = <?php echo $isTestMode ? 'true' : 'false'; ?>;
 const RZP_KEY    = '<?php echo e($razorpayKeyId); ?>';
 
+// Helper to reliably build API URLs
+function apiUrl(path) {
+    const cleanPath = path.replace(/^\/+/, '');
+    if (BASE_URL && (BASE_URL.startsWith('http://') || BASE_URL.startsWith('https://'))) {
+        return `${BASE_URL.replace(/\/+$/, '')}/${cleanPath}`;
+    }
+    return cleanPath;
+}
+
 let selectedCourtId   = null;
 let selectedCourtName = null;
 let selectedSlot      = null;
@@ -373,7 +382,7 @@ async function loadAvailability() {
 
     try {
         // Update court availability dots in background
-        fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}`)
+        fetch(apiUrl(`api/availability.php?venue_id=${VENUE_ID}&date=${date}`))
             .then(r => r.json())
             .then(data => {
                 if (data && data.courts) {
@@ -389,7 +398,7 @@ async function loadAvailability() {
             .catch(err => console.warn('Court availability status warning:', err));
 
         // Load time slots for selected court
-        const res = await fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}&individual_court_id=${selectedCourtId}`);
+        const res = await fetch(apiUrl(`api/availability.php?venue_id=${VENUE_ID}&date=${date}&individual_court_id=${selectedCourtId}`));
         const data = await res.json().catch(() => null);
 
         loader.style.display = 'none';
@@ -481,7 +490,7 @@ async function initiatePayment() {
     const date = document.getElementById('bookingDate').value;
 
     try {
-        const resp = await fetch(`${BASE_URL}/api/booking.php`, {
+        const resp = await fetch(apiUrl('api/booking.php'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
@@ -579,7 +588,7 @@ async function simulateTestPayment(orderData) {
 
 async function verifyPayment(bookingId, orderId, paymentId, signature) {
     try {
-        const resp = await fetch(`${BASE_URL}/api/payment-verify.php`, {
+        const resp = await fetch(apiUrl('api/payment-verify.php'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({

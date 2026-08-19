@@ -21,6 +21,9 @@ date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Kolkata'));
 if (!defined('BASE_URL')) {
     $envUrl = env('APP_URL');
     if (!empty($envUrl) && $envUrl !== 'http://localhost/BookMyCourt' && $envUrl !== 'http://localhost') {
+        if (!str_starts_with($envUrl, 'http://') && !str_starts_with($envUrl, 'https://')) {
+            $envUrl = 'https://' . $envUrl;
+        }
         define('BASE_URL', rtrim($envUrl, '/'));
     } elseif (isset($_SERVER['HTTP_HOST'])) {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
