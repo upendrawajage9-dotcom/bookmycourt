@@ -338,11 +338,13 @@ const CSRF_TOKEN = '<?php echo csrfToken(); ?>';
 const TEST_MODE  = <?php echo $isTestMode ? 'true' : 'false'; ?>;
 const RZP_KEY    = '<?php echo e($razorpayKeyId); ?>';
 
-// Helper to reliably build API URLs
+// Helper to reliably build API URLs from current browser location
 function apiUrl(path) {
     const cleanPath = path.replace(/^\/+/, '');
-    if (BASE_URL && (BASE_URL.startsWith('http://') || BASE_URL.startsWith('https://'))) {
-        return `${BASE_URL.replace(/\/+$/, '')}/${cleanPath}`;
+    if (typeof window !== 'undefined' && window.location) {
+        const pathname = window.location.pathname;
+        const currentDir = pathname.substring(0, pathname.lastIndexOf('/'));
+        return `${window.location.origin}${currentDir}/${cleanPath}`;
     }
     return cleanPath;
 }

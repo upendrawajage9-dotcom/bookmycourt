@@ -17,26 +17,21 @@ require_once ROOT_PATH . '/config/environment.php';
 // Set application timezone (Asia/Kolkata by default for Indian Badminton venues)
 date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Kolkata'));
 
-// Define BASE_URL from environment or auto-detect dynamically based on current server host & path
+// Define BASE_URL from active request (auto-detected) or fallback to environment
 if (!defined('BASE_URL')) {
-    $envUrl = env('APP_URL');
-    if (!empty($envUrl) && $envUrl !== 'http://localhost/BookMyCourt' && $envUrl !== 'http://localhost') {
+    if (isset($_SERVER['HTTP_HOST'])) {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+                    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https://' : 'http://';
+        $host = $_SERVER['HTTP_HOST'];
+        $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+        $scriptDir = preg_replace('/(\/admin|\/api)$/', '', $scriptDir);
+        define('BASE_URL', rtrim($protocol . $host . $scriptDir, '/'));
+    } else {
+        $envUrl = env('APP_URL', 'http://localhost/BookMyCourt');
         if (!str_starts_with($envUrl, 'http://') && !str_starts_with($envUrl, 'https://')) {
             $envUrl = 'https://' . $envUrl;
         }
         define('BASE_URL', rtrim($envUrl, '/'));
-    } elseif (isset($_SERVER['HTTP_HOST'])) {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-        $host = $_SERVER['HTTP_HOST'];
-        $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ''));
-        $appRoot = str_replace('\\', '/', realpath(ROOT_PATH));
-        $subDir = '';
-        if ($docRoot && str_starts_with($appRoot, $docRoot)) {
-            $subDir = substr($appRoot, strlen($docRoot));
-        }
-        define('BASE_URL', rtrim($protocol . $host . $subDir, '/'));
-    } else {
-        define('BASE_URL', rtrim(env('APP_URL', 'http://localhost/BookMyCourt'), '/'));
     }
 }
 
