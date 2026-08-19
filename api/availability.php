@@ -16,7 +16,7 @@
  */
 
 require_once dirname(__DIR__) . '/bootstrap.php';
-requireLogin();
+// Note: Read-only availability check does not require login (booking creation does)
 
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store, no-cache');

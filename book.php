@@ -357,7 +357,7 @@ function selectCourt(cell) {
 }
 
 // ─── Load availability from API ─────────────────────────────────
-function loadAvailability() {
+async function loadAvailability() {
     if (!selectedCourtId) return;
 
     const date = document.getElementById('bookingDate').value;
@@ -371,57 +371,57 @@ function loadAvailability() {
     selectedSlot = null;
     updateProceedBtn();
 
-    // Also update court availability dots
-    fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}`)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.error) {
-                data.courts.forEach(court => {
-                    const cell = document.querySelector(`.court-cell[data-id="${court.id}"]`);
-                    if (cell && !cell.classList.contains('selected')) {
-                        cell.classList.toggle('available', !court.is_fully_booked);
-                        cell.classList.toggle('booked', court.is_fully_booked);
-                    }
-                });
-            }
-        })
-        .catch(err => console.error('Court availability fetch error:', err));
+    try {
+        // Update court availability dots in background
+        fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.courts) {
+                    data.courts.forEach(court => {
+                        const cell = document.querySelector(`.court-cell[data-id="${court.id}"]`);
+                        if (cell && !cell.classList.contains('selected')) {
+                            cell.classList.toggle('available', !court.is_fully_booked);
+                            cell.classList.toggle('booked', court.is_fully_booked);
+                        }
+                    });
+                }
+            })
+            .catch(err => console.warn('Court availability status warning:', err));
 
-    // Load time slots for selected court
-    fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}&individual_court_id=${selectedCourtId}`)
-        .then(r => {
-            if (!r.ok) { throw new Error('API returned status ' + r.status); }
-            return r.json();
-        })
-        .then(data => {
-            loader.style.display = 'none';
-            if (data.error) {
-                console.error('Availability API error:', data.message);
-                showToast(data.message, 'error');
-                slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-exclamation-circle"></i> ' + (data.message || 'Failed to load slots') + '</p>';
-                return;
-            }
+        // Load time slots for selected court
+        const res = await fetch(`${BASE_URL}/api/availability.php?venue_id=${VENUE_ID}&date=${date}&individual_court_id=${selectedCourtId}`);
+        const data = await res.json().catch(() => null);
 
-            if (!data.slots || data.slots.length === 0) {
-                slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-calendar-x"></i> No time slots available for this date.</p>';
-                return;
-            }
+        loader.style.display = 'none';
 
-            slotGrid.innerHTML = data.slots.map(slot => `
-                <div class="slot-cell ${slot.is_booked ? 'booked' : 'available'}"
-                     data-slot="${slot.slot}"
-                     ${slot.is_booked ? '' : `onclick="selectSlot(this, '${slot.slot.replace(/'/g, "\\\'")}')"`}>
-                    ${slot.slot}
-                    ${slot.is_booked ? '<div style="font-size:0.65rem;margin-top:2px;">Booked</div>' : ''}
-                </div>
-            `).join('');
-        })
-        .catch(err => {
-            console.error('Slot fetch error:', err);
-            loader.style.display = 'none';
-            slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-wifi-off"></i> Failed to load availability. Please try again.</p>';
-            showToast('Failed to load availability', 'error');
-        });
+        if (!res.ok || !data || data.error) {
+            const msg = data?.message || `Failed to load slots (Status ${res.status})`;
+            console.error('Availability API error:', msg);
+            slotGrid.innerHTML = `<p class="slot-placeholder" style="color:var(--c-danger-light);"><i class="bi bi-exclamation-circle"></i> ${msg}</p>`;
+            showToast(msg, 'error');
+            return;
+        }
+
+        if (!data.slots || data.slots.length === 0) {
+            slotGrid.innerHTML = '<p class="slot-placeholder"><i class="bi bi-calendar-x"></i> No time slots available for this date.</p>';
+            return;
+        }
+
+        slotGrid.innerHTML = data.slots.map(slot => `
+            <div class="slot-cell ${slot.is_booked ? 'booked' : 'available'}"
+                 data-slot="${slot.slot.replace(/"/g, '&quot;')}"
+                 ${slot.is_booked ? '' : `onclick="selectSlot(this, '${slot.slot.replace(/'/g, "\\\'")}')"`}>
+                ${slot.slot}
+                ${slot.is_booked ? '<div style="font-size:0.65rem;margin-top:2px;">Booked</div>' : ''}
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Slot fetch error:', err);
+        loader.style.display = 'none';
+        slotGrid.innerHTML = '<p class="slot-placeholder" style="color:var(--c-danger-light);"><i class="bi bi-wifi-off"></i> Failed to load availability. Please try again.</p>';
+        showToast('Failed to load availability. Please try again.', 'error');
+    }
 }
 
 function selectSlot(cell, slot) {
@@ -646,7 +646,21 @@ function showTestCards() {
 
 // Load initial availability (for today)
 document.addEventListener('DOMContentLoaded', function() {
-    // If we have courts, don't auto-select — let user pick
+    // Ensure date picker has today's local date as default
+    const dateInput = document.getElementById('bookingDate');
+    const localToday = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+    if (dateInput) {
+        if (!dateInput.value || dateInput.value < localToday) {
+            dateInput.value = localToday;
+        }
+        dateInput.min = localToday;
+    }
+
+    // Auto-select first available court on page load
+    const firstAvailableCourt = document.querySelector('.court-cell.available') || document.querySelector('.court-cell');
+    if (firstAvailableCourt) {
+        selectCourt(firstAvailableCourt);
+    }
 });
 </script>
 

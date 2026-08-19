@@ -19,6 +19,16 @@ function requireLogin(): void
     }
 
     if (empty($_SESSION['user_id'])) {
+        // If it's an API request, return JSON 401 instead of redirecting
+        if (str_contains($_SERVER['REQUEST_URI'] ?? '', '/api/') || 
+            (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) ||
+            (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode(['error' => true, 'message' => 'Please log in to continue.', 'code' => 'UNAUTHORIZED']);
+            exit();
+        }
+
         // Store intended destination for post-login redirect
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
         header('Location: ' . BASE_URL . '/login.php');

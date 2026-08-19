@@ -14,8 +14,28 @@ defined('ROOT_PATH') || define('ROOT_PATH', __DIR__);
 // Load environment first
 require_once ROOT_PATH . '/config/environment.php';
 
-// Define BASE_URL from environment (used in links and redirects)
-define('BASE_URL', rtrim(env('APP_URL', 'http://localhost/BookMyCourt'), '/'));
+// Set application timezone (Asia/Kolkata by default for Indian Badminton venues)
+date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Kolkata'));
+
+// Define BASE_URL from environment or auto-detect dynamically based on current server host & path
+if (!defined('BASE_URL')) {
+    $envUrl = env('APP_URL');
+    if (!empty($envUrl) && $envUrl !== 'http://localhost/BookMyCourt' && $envUrl !== 'http://localhost') {
+        define('BASE_URL', rtrim($envUrl, '/'));
+    } elseif (isset($_SERVER['HTTP_HOST'])) {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+        $host = $_SERVER['HTTP_HOST'];
+        $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ''));
+        $appRoot = str_replace('\\', '/', realpath(ROOT_PATH));
+        $subDir = '';
+        if ($docRoot && str_starts_with($appRoot, $docRoot)) {
+            $subDir = substr($appRoot, strlen($docRoot));
+        }
+        define('BASE_URL', rtrim($protocol . $host . $subDir, '/'));
+    } else {
+        define('BASE_URL', rtrim(env('APP_URL', 'http://localhost/BookMyCourt'), '/'));
+    }
+}
 
 // Load database connector
 require_once ROOT_PATH . '/config/database.php';
