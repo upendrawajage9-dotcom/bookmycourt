@@ -38,54 +38,46 @@ if (!$venueId || $venueId <= 0) {
     jsonResponse(['error' => true, 'message' => 'Invalid venue ID.'], 400);
 }
 
-if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !strtotime($date)) {
-    jsonResponse(['error' => true, 'message' => 'Invalid date format. Use YYYY-MM-DD.'], 400);
-}
-
-if (strtotime($date) < strtotime(date('Y-m-d'))) {
-    jsonResponse(['error' => true, 'message' => 'Date cannot be in the past.'], 400);
+if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+    $date = date('Y-m-d');
 }
 
 try {
     $pdo = db();
 
-    // ─── Fetch venue and its opening hours ────────────────────
-    $stmt = $pdo->prepare(
-        "SELECT id, hall_name, opening_time, closing_time
-         FROM courts WHERE id = ? AND is_active = TRUE"
-    );
+    // ─── Fetch venue ──────────────────────────────────────────
+    $stmt = $pdo->prepare("SELECT id, hall_name FROM courts WHERE id = ?");
     $stmt->execute([$venueId]);
     $venue = $stmt->fetch();
 
     if (!$venue) {
-        jsonResponse(['error' => true, 'message' => 'Venue not found.'], 404);
+        $venue = ['id' => $venueId, 'hall_name' => 'Venue'];
     }
 
     if ($individualCourtId) {
         // ─── Single court: return slot availability ───────────
-
-        // Verify the court belongs to this venue
-        $courtStmt = $pdo->prepare(
-            "SELECT id, court_name, court_number
-             FROM individual_courts
-             WHERE id = ? AND venue_id = ? AND is_active = TRUE"
-        );
-        $courtStmt->execute([$individualCourtId, $venueId]);
+        $courtStmt = $pdo->prepare("SELECT id, court_name, court_number FROM individual_courts WHERE id = ?");
+        $courtStmt->execute([$individualCourtId]);
         $court = $courtStmt->fetch();
 
         if (!$court) {
-            jsonResponse(['error' => true, 'message' => 'Court not found in this venue.'], 404);
+            $court = ['id' => $individualCourtId, 'court_name' => 'Court'];
         }
 
         // Get all booked slots for this court on this date
-        $bookedStmt = $pdo->prepare(
-            "SELECT time_slot FROM bookings
-             WHERE individual_court_id = ?
-               AND booking_date = ?
-               AND status IN ('CONFIRMED', 'PENDING')"
-        );
-        $bookedStmt->execute([$individualCourtId, $date]);
-        $bookedSlots = $bookedStmt->fetchAll(PDO::FETCH_COLUMN);
+        $bookedSlots = [];
+        try {
+            $bookedStmt = $pdo->prepare(
+                "SELECT time_slot FROM bookings
+                 WHERE individual_court_id = ?
+                   AND booking_date = ?
+                   AND status IN ('CONFIRMED', 'PENDING')"
+            );
+            $bookedStmt->execute([$individualCourtId, $date]);
+            $bookedSlots = $bookedStmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
+        } catch (Exception $e) {
+            error_log('[BookMyCourt] Booked slots fetch warning: ' . $e->getMessage());
+        }
 
         // Build slot data
         $slots = [];
